@@ -1,0 +1,15 @@
+appdirs
+certifi
+ecdsa>=0.13
+funcy
+future
+langdetect
+prettytable
+pycrypto>=1.9.1
+pylibscrypt>=1.6.1
+scrypt>=0.8.0
+toolz
+ujson
+urllib3
+voluptuous
+w3lib
