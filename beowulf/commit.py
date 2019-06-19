@@ -319,7 +319,7 @@ class Commit(object):
             if store_keys:
                 if store_owner_key:
                     if self.wallet is not None:
-                        self.wallet.add_private_key(owner_privkey)
+                        self.wallet.addPrivateKey(owner_privkey)
                     new_wallet_file = WalletFile(password=password_wallet, wallet_file=account_name + ".json", account=account_name)
                     new_wallet_file.add_private_key(owner_privkey)
                     new_wallet_file.encrypt_to_cipher_data()
@@ -644,28 +644,26 @@ class Commit(object):
                 nonce,
                 memo,
                 prefix=self.beowulfd.chain_params["prefix"])
-
-        # Get asset token from name
-        asset_token = self.beowulfd.find_smt_tokens_by_name(asset_name)[0]['liquid_symbol']
-        asset_tokens[asset_token['name']] = asset_token['decimals']
-
-        op = operations.Transfer(
-            **{
-                "from":
-                    account,
-                "to":
-                    to,
-                "amount":
-                    '{:.{prec}f} {asset}'.format(
-                        float(amount), prec=asset_token['decimals'], asset=asset_token['name']),
-                "fee":
-                    '{:.{prec}f} {asset}'.format(
-                        float(fee), prec=5, asset=asset_fee),
-                "memo":
-                    memo
-            })
-
         try:
+            # Get asset token from name
+            asset_token = self.beowulfd.find_smt_tokens_by_name(asset_name)[0]['liquid_symbol']
+            asset_tokens[asset_token['name']] = asset_token['decimals']
+
+            op = operations.Transfer(
+                **{
+                    "from":
+                        account,
+                    "to":
+                        to,
+                    "amount":
+                        '{:.{prec}f} {asset}'.format(
+                            float(amount), prec=asset_token['decimals'], asset=asset_token['name']),
+                    "fee":
+                        '{:.{prec}f} {asset}'.format(
+                            float(fee), prec=5, asset=asset_fee),
+                    "memo":
+                        memo
+                })
             return self.finalizeOp(op, account, "owner")
         except Exception as e:
             raise e
