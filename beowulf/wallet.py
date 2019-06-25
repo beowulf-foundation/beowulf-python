@@ -270,20 +270,6 @@ class Wallet:
                     return key
             return False
 
-    def getMemoKeyForAccount(self, name):
-        """ Obtain owner Memo Key for an account from the wallet database
-        """
-        if "memo" in Wallet.keyMap:
-            return Wallet.keyMap.get("memo")
-        else:
-            account = self.beowulfd.get_account(name)
-            if not account:
-                return
-            key = self.getPrivateKeyForPublicKey(account["memo_key"])
-            if key:
-                return key
-            return False
-
     def getAccountFromPrivateKey(self, wif):
         """ Obtain account name from private key
         """
@@ -322,10 +308,11 @@ class Wallet:
                 "pubkey": pub
             }
 
-    def getKeyType(self, account, pub):
+    def getKeyType(self, name, pub):
         """ Get key type
         """
         # for authority in ["owner"]:
+        account = self.beowulfd.get_account(name)
         for authority in ["owner"]:
             for key in account[authority]["key_auths"]:
                 if pub == key[0]:

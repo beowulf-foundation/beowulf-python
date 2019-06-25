@@ -644,26 +644,34 @@ class Commit(object):
                 nonce,
                 memo,
                 prefix=self.beowulfd.chain_params["prefix"])
-        try:
-            # Get asset token from name
-            asset_token = self.beowulfd.find_smt_tokens_by_name(asset_name)[0]['liquid_symbol']
-            asset_tokens[asset_token['name']] = asset_token['decimals']
 
-            op = operations.Transfer(
-                **{
-                    "from":
-                        account,
-                    "to":
-                        to,
-                    "amount":
-                        '{:.{prec}f} {asset}'.format(
-                            float(amount), prec=asset_token['decimals'], asset=asset_token['name']),
-                    "fee":
-                        '{:.{prec}f} {asset}'.format(
-                            float(fee), prec=5, asset=asset_fee),
-                    "memo":
-                        memo
-                })
+        # Get asset token from name
+        list_asset_token = self.beowulfd.find_smt_tokens_by_name(asset_name)
+        if len(list_asset_token) == 0:
+            raise ValueError(
+                "Asset token doesn't exist!")
+
+        # Get asset token from name
+        asset_token = list_asset_token[0]['liquid_symbol']
+        asset_tokens[asset_token['name']] = asset_token['decimals']
+
+        op = operations.Transfer(
+            **{
+                "from":
+                    account,
+                "to":
+                    to,
+                "amount":
+                    '{:.{prec}f} {asset}'.format(
+                        float(amount), prec=asset_token['decimals'], asset=asset_token['name']),
+                "fee":
+                    '{:.{prec}f} {asset}'.format(
+                        float(fee), prec=5, asset=asset_fee),
+                "memo":
+                    memo
+            })
+
+        try:
             return self.finalizeOp(op, account, "owner")
         except Exception as e:
             raise e
