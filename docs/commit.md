@@ -1,4 +1,4 @@
-# beowulf
+# Commit API
 
 # beowulf.commit
 

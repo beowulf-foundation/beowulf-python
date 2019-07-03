@@ -1,4 +1,4 @@
-# beowulf
+# Beowulf API
 
 # beowulf.beowulfd
 

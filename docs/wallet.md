@@ -1,4 +1,4 @@
-# beowulf
+# Wallet API
 
 # beowulf.wallet
 
