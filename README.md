@@ -136,8 +136,8 @@ For bugs or feature requests please create a [GitHub Issue](https://github.com/b
 Full documentation is available at **https://beowulfchain.com/developer-guide/python**
 
 ##### Detail
-1. [Commit API document](https://github.com/beowulf-foundation/beowulf-python/blob/master/docs/beowulfd.md)
-2. [Wallet API document](https://github.com/beowulf-foundation/beowulf-python/blob/master/docs/beowulfd.md)
+1. [Commit API document](https://github.com/beowulf-foundation/beowulf-python/blob/master/docs/commit.md)
+2. [Wallet API document](https://github.com/beowulf-foundation/beowulf-python/blob/master/docs/wallet.md)
 3. [Beowulf API document](https://github.com/beowulf-foundation/beowulf-python/blob/master/docs/beowulfd.md)
 
  
