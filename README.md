@@ -36,7 +36,7 @@ w3lib
 ```
 
 
-# Installation
+## Installation
 
 From Source:
 
@@ -128,10 +128,10 @@ block = c.beowulfd.get_block(block_num)
 print(block)
 ```
 
-# Bugs and Feedback
+## Bugs and Feedback
 For bugs or feature requests please create a [GitHub Issue](https://github.com/beowulf-foundation/beowulf-python/issues).  
 
-# Documentation
+## Documentation
 
 Full documentation is available at **https://beowulfchain.com/developer-guide/python**
 
@@ -140,4 +140,5 @@ Full documentation is available at **https://beowulfchain.com/developer-guide/py
 2. [Wallet API document](https://github.com/beowulf-foundation/beowulf-python/blob/master/docs/wallet.md)
 3. [Beowulf API document](https://github.com/beowulf-foundation/beowulf-python/blob/master/docs/beowulfd.md)
 
- 
+ ## License
+ MIT, see the LICENSE file.  
