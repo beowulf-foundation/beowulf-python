@@ -38,7 +38,12 @@ w3lib
 
 ## Installation
 
-From Source:
+From pip:  
+```bash
+pip install beowulf-python
+```
+
+From Source:  
 
 ```
 git clone https://github.com/beowulf-foundation/beowulf-python.git
@@ -126,6 +131,14 @@ c.transfer_token(to=new_account_name, amount=amount, asset_name=asset_tot, fee=f
 block_num = 1869
 block = c.beowulfd.get_block(block_num)
 print(block)
+```
+
+##### Getting a transaction
+```python
+# Get transaction from transaction_id
+transaction_id = '45618f73e9dbbe87a9ae6bfc316de8457c502b7c'
+trx = c.beowulfd.get_transaction(transaction_id)
+print(trx)
 ```
 
 ## Bugs and Feedback
