@@ -34,7 +34,22 @@ urllib3
 voluptuous
 w3lib
 ```
+## Requirements
+### OSX
 
+On Mac OSX, you may need to do the following first:
+
+```bash
+brew install openssl
+export CFLAGS="-I$(brew --prefix openssl)/include $CFLAGS"
+export LDFLAGS="-L$(brew --prefix openssl)/lib $LDFLAGS"
+```
+
+### Ubuntu
+On Ubuntu, Beowulf-python requires libssl-dev
+```bash
+sudo apt-get install libssl-dev
+```
 
 ## Installation
 
@@ -54,14 +69,9 @@ or
 make install
 ```
 
-## Homebrew Build Prereqs
-
-If you're on a mac, you may need to do the following first:
-
-```
-brew install openssl
-export CFLAGS="-I$(brew --prefix openssl)/include $CFLAGS"
-export LDFLAGS="-L$(brew --prefix openssl)/lib $LDFLAGS"
+## Check version
+```bash
+pip show beowulf-python
 ```
 
 ## Configuration
