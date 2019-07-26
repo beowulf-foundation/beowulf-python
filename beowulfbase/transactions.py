@@ -390,5 +390,4 @@ def fmt_time_from_now_to_epoch(secs=0):
      :rtype: str
 
     """
-    return datetime.utcfromtimestamp(time.time() + int(secs)).strftime(
-        '%S')
+    return int(time.time())
