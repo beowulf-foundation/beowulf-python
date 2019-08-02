@@ -308,11 +308,10 @@ class Wallet:
                 "pubkey": pub
             }
 
-    def getKeyType(self, name, pub):
+    def getKeyType(self, account, pub):
         """ Get key type
         """
         # for authority in ["owner"]:
-        account = self.beowulfd.get_account(name)
         for authority in ["owner"]:
             for key in account[authority]["key_auths"]:
                 if pub == key[0]:
