@@ -365,7 +365,7 @@ class Commit(object):
             password=None,
             owner_key=None,
             store_keys=True,
-            store_owner_key=False,
+            store_owner_key=True,
     ):
         """ Create new account in Beowulf
 
