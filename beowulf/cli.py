@@ -42,7 +42,7 @@ def legacyentry():
         '--node',
         type=str,
         default=configStorage["node"],
-        help='URL for public Beowulf API (default: "https://testnet-bw.beowulfchain.com")'
+        help='URL for public Beowulf API (default: "https://bw.beowulfchain.com")'
     )
 
     parser.add_argument(

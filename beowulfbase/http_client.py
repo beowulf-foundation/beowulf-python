@@ -335,11 +335,11 @@ class HttpClient(object):
         This will fail loudly in the event that incorrect input has been passed.
 
         There are three types of input allowed when defining nodes.
-        1. a string of a single node url. ie nodes='https://testnet-bw.beowulfchain.com'
+        1. a string of a single node url. ie nodes='https://bw.beowulfchain.com'
         2. a comma separated string of several node url's.
-            nodes='https://testnet-bw.beowulfchain.com,<<community node>>,<<your personal node>>'
+            nodes='https://bw.beowulfchain.com,<<community node>>,<<your personal node>>'
         3. a list of string node url's.
-            nodes=['https://testnet-bw.beowulfchain.com','<<community node>>','<<your personal node>>']
+            nodes=['https://bw.beowulfchain.com','<<community node>>','<<your personal node>>']
 
         Any other input will result in a ValueError being thrown.
 

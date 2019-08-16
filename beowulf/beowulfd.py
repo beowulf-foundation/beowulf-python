@@ -41,7 +41,7 @@ class Beowulfd(HttpClient):
 
     def __init__(self, nodes=None, **kwargs):
         if not nodes:
-            nodes = get_config_node_list() or ['https://testnet-bw.beowulfchain.com/rpc']
+            nodes = get_config_node_list() or ['https://bw.beowulfchain.com/rpc']
         super(Beowulfd, self).__init__(nodes, **kwargs)
 
     @property
