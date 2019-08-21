@@ -129,7 +129,7 @@ class UploadCommand(Command):
 # Where the magic happens:
 setup(
     name=NAME,
-    version='0.0.1',
+    version='0.0.2',
     description=DESCRIPTION,
     keywords=['beowulf', 'beowulf-python', 'beowulfchain', 'cryptocurrency', 'blockchain'],
     long_description='beowulf-python is the official Beowulf library for Python.',
