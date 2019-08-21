@@ -55,7 +55,11 @@ sudo apt-get install libssl-dev
 
 From pip:  
 ```bash
+// MainNet
 pip install beowulf-python
+
+// TestNet
+pip install beowulf-python-testnet
 ```
 
 From Source:  
