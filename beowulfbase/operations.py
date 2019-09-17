@@ -36,7 +36,7 @@ class Operation:
             self.name = self.to_class_name(name)
             try:
                 klass = self.get_class(self.name)
-            except:  # noqa FIXME(sneak)
+            except:  # noqa FIXME
                 raise NotImplementedError(
                     "Unimplemented Operation %s" % self.name)
             else:
@@ -149,6 +149,7 @@ class Permission(GrapheneObject):
                 key=lambda x: repr(PublicKey(x[0], prefix=prefix)),
                 reverse=False,
             )
+
             kwargs["account_auths"] = sorted(
                 kwargs["account_auths"],
                 key=lambda x: x[0],
@@ -157,6 +158,7 @@ class Permission(GrapheneObject):
 
             accountAuths = Map([[String(e[0]), Uint16(e[1])]
                                 for e in kwargs["account_auths"]])
+
             keyAuths = Map([[PublicKey(e[0], prefix=prefix),
                              Uint16(e[1])] for e in kwargs["key_auths"]])
             super(Permission, self).__init__(
@@ -180,8 +182,8 @@ class Memo(GrapheneObject):
 
             super(Memo, self).__init__(
                 OrderedDict([
-                    ('from', PublicKey(kwargs["from"], prefix=prefix)),
-                    ('to', PublicKey(kwargs["to"], prefix=prefix)),
+                    # ('from', PublicKey(kwargs["from"], prefix=prefix)),
+                    # ('to', PublicKey(kwargs["to"], prefix=prefix)),
                     ('nonce', Uint64(int(kwargs["nonce"]))),
                     ('check', Uint32(int(kwargs["check"]))),
                     ('encrypted', Bytes(kwargs["encrypted"])),

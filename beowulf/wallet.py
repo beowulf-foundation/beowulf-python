@@ -70,6 +70,12 @@ class Wallet:
             self.keyEncryptionKey = KeyEncryptionKey
             self.keyStorage = keyStorage
 
+        # clean unnecessary key-pairs
+        for pub in self.getPublicKeys():
+            info = self.getAccountFromPublicKey(pub)
+            if info is None:
+                self.removePrivateKeyFromPublicKey(pub)
+
     def setKeys(self, loadkeys):
         """ This method is strictly only for in memory keys that are
             passed to Wallet/Beowulf with the ``keys`` argument
@@ -85,7 +91,7 @@ class Wallet:
         for wif in loadkeys:
             try:
                 key = PrivateKey(wif)
-            except:  # noqa FIXME(sneak)
+            except:  # noqa FIXME
                 raise InvalidWifError
             Wallet.keys[format(key.pubkey, self.prefix)] = str(key)
 
@@ -162,7 +168,7 @@ class Wallet:
             # Try to decode as wif
             PrivateKey(encwif)
             return encwif
-        except:  # noqa FIXME(sneak)
+        except:  # noqa FIXME
             pass
         self.unlock()
         return format(bip38.decrypt(encwif, self.decryptedKEK), "wif")
@@ -205,7 +211,7 @@ class Wallet:
             wif = str(wif)
         try:
             pub = format(PrivateKey(wif).pubkey, self.prefix)
-        except:  # noqa FIXME(sneak)
+        except:  # noqa FIXME
             raise InvalidWifError(
                 "Invalid Private Key Format. Please use WIF!")
 
@@ -243,8 +249,6 @@ class Wallet:
             # Test if wallet exists
             if not self.created():
                 self.newWallet()
-                # "For demo"
-                # self.newWalletDemo()
             self.keyStorage.delete(pub)
 
     def removeAccount(self, account):
@@ -298,7 +302,7 @@ class Wallet:
         else:
             try:
                 account = Account(name, beowulfd_instance)
-            except:  # noqa FIXME(sneak)
+            except:  # noqa FIXME
                 return
             keyType = self.getKeyType(account, pub)
             return {

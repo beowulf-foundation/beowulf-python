@@ -67,7 +67,7 @@ def _unpad(s, BS):
     return s
 
 
-def encode_memo(priv, pub, nonce, message, **kwargs):
+def encode_memo(priv, pub, nonce, message):
     """ Encode a message with a shared secret between Alice and Bob
 
         :param PrivateKey priv: Private Key (of Alice)
@@ -88,10 +88,7 @@ def encode_memo(priv, pub, nonce, message, **kwargs):
         raw = _pad(raw, BS)
     " Encryption "
     cipher = hexlify(aes.encrypt(raw)).decode('ascii')
-    prefix = kwargs.pop("prefix", default_prefix)
     s = OrderedDict([
-        ("from", format(priv.pubkey, prefix)),
-        ("to", format(pub, prefix)),
         ("nonce", nonce),
         ("check", check),
         ("encrypted", cipher),
@@ -104,7 +101,7 @@ def encode_memo(priv, pub, nonce, message, **kwargs):
     return "#" + base58encode(hexlify(compat_bytes(tx)).decode("ascii"))
 
 
-def decode_memo(priv, message):
+def decode_memo(priv, message, from_key, to_key):
     """ Decode a message with a shared secret between Alice and Bob
 
         :param PrivateKey priv: Private Key (of Bob)
@@ -113,14 +110,16 @@ def decode_memo(priv, message):
         :rtype: str
         :raise ValueError: if message cannot be decoded as valid UTF-8
                string
+        :param PublicKey from_key: Public Key (of Alice)
+        :param PublicKey to_key: Public Key (of Bob)
 
     """
     " decode structure "
     raw = base58decode(message[1:])
-    from_key = PublicKey(raw[:66])
-    raw = raw[66:]
-    to_key = PublicKey(raw[:66])
-    raw = raw[66:]
+    # from_key = PublicKey(raw[:66])
+    # raw = raw[66:]
+    # to_key = PublicKey(raw[:66])
+    # raw = raw[66:]
     nonce = str(struct.unpack_from("<Q", unhexlify(raw[:16]))[0])
     raw = raw[16:]
     check = struct.unpack_from("<I", unhexlify(raw[:8]))[0]
@@ -146,7 +145,7 @@ def decode_memo(priv, message):
     message = aes.decrypt(unhexlify(compat_bytes(message, 'ascii')))
     try:
         return _unpad(message.decode('utf8'), 16)
-    except:  # noqa FIXME(sneak)
+    except:  # noqa FIXME
         raise ValueError(message)
 
 

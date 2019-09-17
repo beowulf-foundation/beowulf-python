@@ -71,10 +71,10 @@ def JsonObj(data):
         else:
             return compat_json(json.loads(str(data), object_hook=compat_json),
                                ignore_dicts=True)
-    except Exception as e:  # noqa FIXME(sneak)
+    except Exception as e:  # noqa FIXME
         try:
             return data.__str__()
-        except:  # noqa FIXME(sneak)
+        except:  # noqa FIXME
             raise ValueError('JsonObj could not parse %s:\n%s' %
                              (type(data).__name__, data.__class__))
 

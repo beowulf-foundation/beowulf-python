@@ -243,7 +243,7 @@ class Configuration(DataDir):
                                                    timeformat)).days > 7:
                 # print("Backups older than 7 days!")
                 self.refreshBackup()
-        except:  # noqa FIXME(sneak)
+        except:  # noqa FIXME
             self.refreshBackup()
 
     def _haveKey(self, key):
@@ -336,7 +336,7 @@ class WrongKEKException(Exception):
 class KeyEncryptionKey(object):
     """ The keys are encrypted with a KeyEncryptionKey that is stored in
         the configurationStore. It has a checksum to verify correctness
-        of the userPassphrase
+        of the user_passphrase
     """
 
     userPassphrase = ""
@@ -351,10 +351,10 @@ class KeyEncryptionKey(object):
             random encrypted KeyEncryptionKey that is stored in the
             configuration.
 
-            The userPassphrase is used to encrypt this KeyEncryptionKey. To
+            The user_passphrase is used to encrypt this KeyEncryptionKey. To
             decrypt the keys stored in the keys database, one must use
             BIP38, decrypt the KeyEncryptionKey from the configuration
-            store with the userPassphrase, and use the decrypted
+            store with the user_passphrase, and use the decrypted
             KeyEncryptionKey to decrypt the BIP38 encrypted private keys
             from the keys storage!
 
@@ -374,7 +374,7 @@ class KeyEncryptionKey(object):
         checksum, encrypted_kek = configStorage[self.config_key].split("$")
         try:
             decrypted_kek = aes.decrypt(encrypted_kek)
-        except:  # noqa FIXME(sneak)
+        except:  # noqa FIXME
             raise WrongKEKException
         if checksum != self.deriveChecksum(decrypted_kek):
             raise WrongKEKException
@@ -387,7 +387,7 @@ class KeyEncryptionKey(object):
         checksum, encrypted_kek = configStorage[self.config_key].split("$")
         try:
             decrypted_kek = aes.decrypt(encrypted_kek)
-        except:  # noqa FIXME(sneak)
+        except:  # noqa FIXME
             raise WrongKEKException
         if checksum != self.deriveChecksum(decrypted_kek):
             raise WrongKEKException

@@ -79,7 +79,7 @@ pip show beowulf-python
 ```
 
 ## Configuration
-Create a new client instance of Beowulfd  
+Create a new client instance of Beowulfd and add your account to wallet 
   
 ```python
 from beowulf.beowulfd import Beowulfd
@@ -87,12 +87,17 @@ from beowulf.commit import Commit
 
 # Client setup
 s = Beowulfd()
+# Replace with your Private key and account name already have or get 
+# from services
 pri_key = "5Jxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-creator = "creatorwallet"
+account = "creatorwallet"
+
 c = Commit(beowulfd_instance=s, no_wallet_file=True)
+# Provide a passphrase for the new wallet for the first time.
+# Unlock wallet before create transactions with passphrase.
 c.wallet.unlock("your_password")
 
-if not c.wallet.getOwnerKeyForAccount(creator):
+if not c.wallet.getOwnerKeyForAccount(account):
     c.wallet.addPrivateKey(pri_key)    
 ```
 
@@ -110,8 +115,8 @@ print(pub_key)
 ##### Creating a wallet
 ```python
 # Variances
-new_account_name = "newwallet"
 creator = "creatorwallet"
+new_account_name = "newwallet"
 new_password_seed = "password_seed"
 new_password_wallet = "password_wallet"
 

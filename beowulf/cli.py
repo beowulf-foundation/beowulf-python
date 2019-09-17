@@ -461,7 +461,7 @@ def legacyentry():
                             value = json.dumps(value, indent=4)
                         t.add_row([key, value])
                     print(t)
-                except:  # noqa FIXME(sneak)
+                except:  # noqa FIXME
                     pass
             # Public Key
             elif re.match("^BEO.{48,55}$", obj):

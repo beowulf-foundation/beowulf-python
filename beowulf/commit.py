@@ -21,8 +21,11 @@ BEOWULF_NAI_SHIFT = 5
 SMT_ASSET_NUM_CONTROL_MASK = 0x10
 SMT_ASSET_NUM_CONTROL_REVERT_MASK = 0xF
 BEOWULF_NAI_DATA_DIGITS = 100
+MIN_ACCOUNT_NAME_LENGTH = 2
+MAX_ACCOUNT_NAME_LENGTH = 16
 MIN_ACCOUNT_CREATION_FEE = Amount("0.1 W")
 MIN_TOKEN_CREATION_FEE = Amount("1000 W")
+MIN_TRANSFER_FEE = Amount("0.01 W")
 
 
 class Commit(object):
@@ -51,9 +54,8 @@ class Commit(object):
         * **Force keys**: This more is for advanced users and
           requires that you know what you are doing. Here, the
           ``keys`` parameter is a dictionary that overwrite the
-          ``active``, ``owner``, ``posting`` or ``memo`` keys for
-          any account. This mode is only used for *foreign*
-          signatures!
+          ``owner`` keys for any account. This mode is only used for
+          *foreign* signatures!
     """
 
     def __init__(self, beowulfd_instance=None, no_broadcast=False, no_wallet_file=True, **kwargs):
@@ -62,11 +64,11 @@ class Commit(object):
         self.no_wallet_file = no_wallet_file
         self.unsigned = kwargs.get("unsigned", False)
         self.expiration = int(kwargs.get("expiration", 60))
+        self.wallet = None
+        self.wallet_file = None
         if self.no_wallet_file:
             self.wallet = Wallet(self.beowulfd, **kwargs)
-            self.wallet_file = None
         else:
-            self.wallet = None
             self.wallet_file = WalletFile(**kwargs)
 
     def finalizeOp(self, ops, account, permission):
@@ -201,64 +203,29 @@ class Commit(object):
                the network. If you create an account, you will
                need to pay for that fee!
 
-               **You can partially pay that fee by delegating M.**
-
-               To pay the fee in full in BWF, leave
-               ``delegation_fee_beowulf`` set to ``0 BWF`` (Default).
-
-               To pay the fee partially in BWF, partially with delegated
-               M, set ``delegation_fee_beowulf`` to a value greater than ``1
-               BWF``. `Required M will be calculated automatically.`
-
-               To pay the fee with maximum amount of delegation, set
-               ``delegation_fee_beowulf`` to ``1 W``. `Required M will be
-               calculated automatically.`
-
             .. warning:: Don't call this method unless you know what
                           you are doing! Be sure to understand what this
                           method does and where to find the private keys
                           for your account.
 
-            .. note:: Please note that this imports private keys (if password is
-            present) into the wallet by default. However, it **does not import
-            the owner key** unless `store_owner_key` is set to True (default
-            False). Do NOT expect to be able to recover it from the wallet if
-            you lose your password!
+        .. note:: Please note that this imports private keys (if password is
+        present) into the wallet by default. However, it **does not import
+        the owner key** unless `store_owner_key` is set to True (default
+        False). Do NOT expect to be able to recover it from the wallet if
+        you lose your password!
 
             :param str account_name: (**required**) new account name
             :param str json_meta: Optional meta data for the account
             :param str owner_key: Main owner key
-            :param str active_key: Main active key
-            :param str posting_key: Main posting key
-            :param str memo_key: Main memo_key
-            :param str password: Alternatively to providing keys, one
+            :param str password_seed: Alternatively to providing keys, one
                                  can provide a password from which the
                                  keys will be derived
-            :param list additional_owner_keys:  Additional owner public keys
-
-            :param list additional_active_keys: Additional active public keys
-
-            :param list additional_posting_keys: Additional posting public keys
-
-            :param list additional_owner_accounts: Additional owner account
-            names
-
-            :param list additional_active_accounts: Additional active account
-            names
-
-            :param list additional_posting_accounts: Additional posting account
-            names
-
+            :param password_wallet: Password of wallet file
             :param bool store_keys: Store new keys in the wallet (default:
             ``True``)
 
             :param bool store_owner_key: Store owner key in the wallet
             (default: ``False``)
-
-            :param str delegation_fee_beowulf: (Optional) If set, `creator` pay a
-            fee of this amount, and delegate the rest with M (calculated
-            automatically). Minimum: 1 BWF. If left to 0 (Default), full fee
-            is paid without M delegation.
 
             :param str creator: which account should pay the registration fee
                                 (defaults to ``default_account``)
@@ -289,8 +256,37 @@ class Commit(object):
             creator=None,
             password_wallet=None
     ):
-        assert len(
-            account_name) <= 16, "Account name must be at most 16 chars long"
+        """ Create new account with advance mode in Beowulf
+
+                    :param str account_name: (**required**) new account name
+                    :param str json_meta: Optional meta data for the account
+                    :param str owner_key: Main owner key
+                    :param str password_seed: Alternatively to providing keys, one
+                                         can provide a password from which the
+                                         keys will be derived
+                    :param password_wallet: Password of wallet file
+                    :param list additional_owner_keys:  Additional owner public keys
+
+                    :param list additional_owner_accounts: Additional owner account
+                    names
+                    :param owner_weight_threshold: Owner weight threshold owner
+                    key/account
+                    :param bool store_keys: Store new keys in the wallet (default:
+                    ``True``)
+
+                    :param bool store_owner_key: Store owner key in the wallet
+                    (default: ``False``)
+
+                    :param str creator: which account should pay the registration fee
+                                        (defaults to ``default_account``)
+
+                :raises AccountExistsException: if the account already exists on the
+                blockchain
+
+                """
+
+        assert MIN_ACCOUNT_NAME_LENGTH < len(
+            account_name) <= MAX_ACCOUNT_NAME_LENGTH, "Account name must be 3-16 chars long"
 
         if not creator:
             creator = configStorage.get("default_account")
@@ -300,11 +296,12 @@ class Commit(object):
                 "creator=x, or set the default_account using beowulfpy")
         if password_seed and owner_key:
             raise ValueError("You cannot use 'password' AND provide keys!")
-
+        if not password_wallet:
+            raise ValueError("You must provide 'password_wallet'!")
         # check if account already exists
         try:
             Account(account_name, beowulfd_instance=self.beowulfd)
-        except:  # noqa FIXME(sneak)
+        except:  # noqa FIXME
             pass
         else:
             raise AccountExistsException("account has been created")
@@ -320,15 +317,21 @@ class Commit(object):
                 if store_owner_key:
                     if self.wallet is not None:
                         self.wallet.addPrivateKey(owner_privkey)
-                    new_wallet_file = WalletFile(password=password_wallet, wallet_file=account_name + ".json", account=account_name)
-                    new_wallet_file.add_private_key(owner_privkey)
-                    new_wallet_file.encrypt_to_cipher_data()
-                    new_wallet_file.save_file()
-                    new_wallet_file.purge()
+                    try:
+                        new_wallet_file = WalletFile(password=password_wallet,
+                                                     wallet_file=account_name + ".json", account=account_name)
+                        new_wallet_file.add_private_key(owner_privkey)
+                        new_wallet_file.encrypt_to_cipher_data()
+                        new_wallet_file.save_file()
+                        logging.info("New wallet file:" + new_wallet_file.wallet_filename)
+                        new_wallet_file.purge()
+                    except:
+                        raise ValueError(
+                            "Create new wallet file incomplete!")
 
         elif owner_key:
-            owner_pubkey = PublicKey(
-                owner_key, prefix=self.beowulfd.chain_params["prefix"])
+            owner_pubkey = PublicKey(format(PrivateKey(owner_key).pubkey,
+                                            self.beowulfd.chain_params["prefix"]))
         else:
             raise ValueError(
                 "Call incomplete! Provide either a password or public keys!")
@@ -348,15 +351,18 @@ class Commit(object):
             owner_accounts_authority.append([k, 1])
             total_owner_weight += 1
 
+        if not owner_weight_threshold:
+            owner_weight_threshold = 1
+
         if total_owner_weight < owner_weight_threshold:
             raise InvalidParamCreateAccount("total weight of owner permission must greater than owner_weight_threshold")
 
         return self.create_account(account_name=account_name,
-                                    json_meta=json_meta,
-                                    owner_keys=owner_key_authority,
-                                    owner_accounts=owner_accounts_authority,
-                                    owner_weight_threshold=owner_weight_threshold,
-                                    creator=creator)
+                                   json_meta=json_meta,
+                                   owner_keys=owner_key_authority,
+                                   owner_accounts=owner_accounts_authority,
+                                   owner_weight_threshold=owner_weight_threshold,
+                                   creator=creator)
 
     def account_update(
             self,
@@ -365,7 +371,7 @@ class Commit(object):
             password=None,
             owner_key=None,
             store_keys=True,
-            store_owner_key=True,
+            store_owner_key=False,
     ):
         """ Create new account in Beowulf
 
@@ -409,25 +415,12 @@ class Commit(object):
             :param str account_name: (**required**) new account name
             :param str json_meta: Optional meta data for the account
             :param str owner_key: Main owner key
-            :param str active_key: Main active key
-            :param str posting_key: Main posting key
-            :param str memo_key: Main memo_key
             :param str password: Alternatively to providing keys, one
                                  can provide a password from which the
                                  keys will be derived
             :param list additional_owner_keys:  Additional owner public keys
 
-            :param list additional_active_keys: Additional active public keys
-
-            :param list additional_posting_keys: Additional posting public keys
-
             :param list additional_owner_accounts: Additional owner account
-            names
-
-            :param list additional_active_accounts: Additional active account
-            names
-
-            :param list additional_posting_accounts: Additional posting account
             names
 
             :param bool store_keys: Store new keys in the wallet (default:
@@ -436,15 +429,9 @@ class Commit(object):
             :param bool store_owner_key: Store owner key in the wallet
             (default: ``False``)
 
-            :param str delegation_fee_beowulf: (Optional) If set, `creator` pay a
-            fee of this amount, and delegate the rest with M (calculated
-            automatically). Minimum: 1 BWF. If left to 0 (Default), full fee
-            is paid without M delegation.
+        :raises AccountExistsException: if the account already exists on the
+        blockchain
 
-            :param str creator: which account should pay the registration fee
-                                (defaults to ``default_account``)
-
-            :raises AccountExistsException: if the account already exists on the blockchain
         """
         assert len(
             account_name) <= 16, "Account name must be at most 16 chars long"
@@ -452,7 +439,7 @@ class Commit(object):
         # check if account already exists
         try:
             Account(account_name, beowulfd_instance=self.beowulfd)
-        except:  # noqa FIXME(sneak)
+        except:  # noqa FIXME
             raise AccountDoesNotExistsException("Can not update unavailable account")
 
         " Generate new keys from password"
@@ -464,7 +451,7 @@ class Commit(object):
             # store private keys
             if store_keys:
                 if store_owner_key:
-                    self.wallet.add_private_key(owner_privkey)
+                    self.wallet.addPrivateKey(owner_privkey)
 
         elif owner_key:
             owner_pubkey = PublicKey(
@@ -499,7 +486,7 @@ class Commit(object):
 
         return self.finalizeOp(op, account_name, "owner")
 
-    def transfer(self, to, amount, asset, fee, asset_fee, memo="", account=None):
+    def transfer(self, to, amount, asset, fee=None, asset_fee=None, memo="", account=None):
         """ Transfer W or BWF to another account.
 
             :param str to: Recipient
@@ -517,6 +504,7 @@ class Commit(object):
 
             :param str account: (optional) the source account for the transfer
             if not ``default_account``
+
         """
         if not account:
             account = configStorage.get("default_account")
@@ -525,21 +513,33 @@ class Commit(object):
 
         assert asset in ['BWF', 'W']
 
+        if not fee and not asset_fee:
+            fee = MIN_TRANSFER_FEE.amount
+            asset_fee = MIN_TRANSFER_FEE.symbol
+        else:
+            assert asset_fee is 'W'
+
         if memo and memo[0] == "#":
             from beowulfbase import memo as Memo
-            memo_wif = self.wallet.getMemoKeyForAccount(account)
+            from_account = Account(account, beowulfd_instance=self.beowulfd)
+            pub_from = next(iter(from_account["owner"]["key_auths"][0]))
+            to_account = Account(to, beowulfd_instance=self.beowulfd)
+            pub_to = next(iter(to_account["owner"]["key_auths"][0]))
+
+            if self.no_wallet_file:
+                memo_wif = self.wallet.getOwnerKeyForAccount(account)
+            else:
+                memo_wif = self.wallet_file.get_privkey_from_pubkey_in_wallet_file(pub_from)
             if not memo_wif:
                 raise MissingKeyError("Memo key for %s missing!" % account)
-            to_account = Account(to, beowulfd_instance=self.beowulfd)
             nonce = random.getrandbits(64)
             memo = Memo.encode_memo(
                 PrivateKey(memo_wif),
                 PublicKey(
-                    to_account["memo_key"],
+                    pub_to,
                     prefix=self.beowulfd.chain_params["prefix"]),
                 nonce,
-                memo,
-                prefix=self.beowulfd.chain_params["prefix"])
+                memo)
 
         op = operations.Transfer(
             **{
@@ -603,7 +603,7 @@ class Commit(object):
 
         return self.finalizeOp(op, creator, "owner"), new_token
 
-    def transfer_token(self, to, amount, asset_name, fee, asset_fee, memo="", account=None):
+    def transfer_token(self, to, amount, asset_name, fee=None, asset_fee=None, memo="", account=None):
         """ Transfer W or BWF to another account.
 
             :param str to: Recipient
@@ -627,23 +627,33 @@ class Commit(object):
         if not account:
             raise ValueError("You need to provide an account")
 
-        assert asset_fee is 'W'
+        if not fee and not asset_fee:
+            fee = MIN_TRANSFER_FEE.amount
+            asset_fee = MIN_TRANSFER_FEE.symbol
+        else:
+            assert asset_fee is 'W'
 
         if memo and memo[0] == "#":
             from beowulfbase import memo as Memo
-            memo_wif = self.wallet.getMemoKeyForAccount(account)
+            from_account = Account(account, beowulfd_instance=self.beowulfd)
+            pub_from = next(iter(from_account["owner"]["key_auths"][0]))
+            to_account = Account(to, beowulfd_instance=self.beowulfd)
+            pub_to = next(iter(to_account["owner"]["key_auths"][0]))
+
+            if self.no_wallet_file:
+                memo_wif = self.wallet.getOwnerKeyForAccount(account)
+            else:
+                memo_wif = self.wallet_file.get_privkey_from_pubkey_in_wallet_file(pub_from)
             if not memo_wif:
                 raise MissingKeyError("Memo key for %s missing!" % account)
-            to_account = Account(to, beowulfd_instance=self.beowulfd)
             nonce = random.getrandbits(64)
             memo = Memo.encode_memo(
                 PrivateKey(memo_wif),
                 PublicKey(
-                    to_account["memo_key"],
+                    pub_to,
                     prefix=self.beowulfd.chain_params["prefix"]),
                 nonce,
-                memo,
-                prefix=self.beowulfd.chain_params["prefix"])
+                memo)
 
         # Get asset token from name
         list_asset_token = self.beowulfd.find_smt_tokens_by_name(asset_name)
@@ -695,7 +705,7 @@ class Commit(object):
             raise ValueError("You need to provide an account")
 
         if not fee:
-            fee = MIN_ACCOUNT_CREATION_FEE.amount
+            fee = MIN_TRANSFER_FEE.amount
 
         op = operations.WithdrawVesting(
             **{
@@ -752,19 +762,11 @@ class Commit(object):
         return self.finalizeOp(op, account, "owner")
 
     def supernode_update(self, signing_key, fee=None, account=None):
-        """ Update supernode
+        """ Update properties supernode
 
             :param pubkey signing_key: Signing key
-            :param dict props: Properties
             :param float fee: fee to update supernode
             :param str account: (optional) supernode account name
-
-             Properties:::
-
-                {
-                    "account_creation_fee": x,
-                    "maximum_block_size": x,
-                }
 
         """
         if not account:

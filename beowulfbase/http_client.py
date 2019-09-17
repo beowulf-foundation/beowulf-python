@@ -285,6 +285,7 @@ class HttpClient(object):
                     if self._is_error_recoverable(result['error']):
                         raise RPCErrorRecoverable(detail)
                     else:
+                        logging.error(detail)
                         raise RPCError(detail)
 
                 return result['result']

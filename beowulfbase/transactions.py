@@ -29,7 +29,7 @@ try:
 
     USE_SECP256K1 = True
     log.debug("Loaded secp256k1 binding.")
-except:  # noqa FIXME(sneak)
+except:  # noqa FIXME
     USE_SECP256K1 = False
     log.debug("To speed up transactions signing install \n"
               "    pip install secp256k1")
@@ -118,7 +118,7 @@ class SignedTransaction(GrapheneObject):
         x_str = ecdsa.util.number_to_string(p.x(), order)
         return compat_bytes(compat_chr(2 + (p.y() & 1)), 'ascii') + x_str
 
-    # FIXME(sneak) this should be reviewed for correctness
+    # FIXME this should be reviewed for correctness
     def recover_public_key(self, digest, signature, i):
         """ Recover the public key from the the signature
         """
@@ -184,11 +184,11 @@ class SignedTransaction(GrapheneObject):
         #   bytes(self) will give the wire formatted data according to
         #   GrapheneObject and the data given in __init__()
 
-        from beowulf.beowulfd import Beowulfd
-        tx_hex = Beowulfd().get_transaction_hex(self.json())
+        # from beowulf.beowulfd import Beowulfd
+        # tx_hex = Beowulfd().get_transaction_hex(self.json())
         # print("Server:", unhexlify(tx_hex[0:-2]))
         # print("Client:", compat_bytes(self))
-        self.message = unhexlify(self.chainid + tx_hex[0:-2])
+        # self.message = unhexlify(self.chainid + tx_hex[0:-2])
 
         self.message = unhexlify(self.chainid) + compat_bytes(self)
         self.digest = hashlib.sha256(self.message).digest()
@@ -253,7 +253,7 @@ class SignedTransaction(GrapheneObject):
                 and not (sig[32] & 0x80)
                 and not (sig[32] == 0 and not (sig[33] & 0x80)))
 
-    # FIXME(sneak) audit this function
+    # FIXME audit this function
     def sign(self, wifkeys, chain=None):
         """ Sign the transaction with the provided private keys.
 

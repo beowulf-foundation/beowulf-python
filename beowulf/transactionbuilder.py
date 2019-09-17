@@ -80,7 +80,7 @@ class TransactionBuilder(dict):
             try:
                 PrivateKey(wif)
                 self.wifs.append(wif)
-            except:  # noqa FIXME(sneak)
+            except:  # noqa FIXME
                 raise InvalidKeyFormat
 
     def constructTx(self):
@@ -119,7 +119,7 @@ class TransactionBuilder(dict):
         try:
             # not signed yet
             signedtx = SignedTransaction(**self.json())
-        except Exception as e:  # noqa FIXME(sneak)
+        except Exception as e:  # noqa FIXME
             raise e
 
         if not any(self.wifs):

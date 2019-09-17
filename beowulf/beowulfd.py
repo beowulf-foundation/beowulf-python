@@ -7,7 +7,6 @@ from .instance import get_config_node_list
 from .utils import compat_compose_dictionary
 logger = logging.getLogger(__name__)
 
-
 class Beowulfd(HttpClient):
     """ Connect to the Beowulf network.
 
@@ -41,7 +40,8 @@ class Beowulfd(HttpClient):
 
     def __init__(self, nodes=None, **kwargs):
         if not nodes:
-            nodes = get_config_node_list() or ['https://bw.beowulfchain.com/rpc']
+            nodes = get_config_node_list() or ['https://bw.beowulfchain.com']
+
         super(Beowulfd, self).__init__(nodes, **kwargs)
 
     @property
@@ -380,7 +380,25 @@ class Beowulfd(HttpClient):
             'get_key_references', public_keys, api='account_by_key_api')
 
     def find_smt_tokens_by_name(self, name):
+        """ find_smt_tokens_by_name """
         return self.call('find_smt_tokens_by_name', [name], api='database_api')
-        
+
     def list_smt_tokens(self):
+        """ list_smt_tokens """
         return self.call('list_smt_tokens', api='database_api')
+
+    def get_balance(self, account, token):
+        """ get_balance """
+        return self.call('get_balance', account, token, api='database_api')
+
+    def get_supernode_voted_by_acc(self, account):
+        """ get_supernode_voted_by_acc """
+        return self.call('get_supernode_voted_by_acc', account, api='database_api')
+
+    def get_pending_transaction_count(self):
+        """ get_pending_transaction_count """
+        return self.call('get_pending_transaction_count', api='database_api')
+
+    def get_transaction_with_status(self, tx_hex):
+        """ get_transaction_with_status """
+        return self.call('get_transaction_with_status', tx_hex, api='database_api')

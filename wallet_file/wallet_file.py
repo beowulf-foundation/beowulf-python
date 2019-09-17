@@ -6,12 +6,20 @@ from binascii import hexlify, unhexlify
 import Crypto
 from Crypto import Random
 from Crypto.Cipher import AES
+from appdirs import user_data_dir
 from beowulfbase.account import PrivateKey
 from beowulf.utils import compat_bytes
 
+appname = "BWF"
+appauthor = "Kdev Team"
+wallet_dir = user_data_dir(appname, appauthor)
 
-WALLET_DIR = os.getcwd() + os.sep + "tmp" + os.sep
 SALT_SIZE = 16
+
+# number of iterations in the key generation
+NUMBER_OF_ITERATIONS = 20
+
+# the size multiple required for AES
 AES_MULTIPLE = 16
 
 
@@ -38,10 +46,10 @@ class WalletFile(object):
             random encrypted KeyEncryptionKey that is stored in the
             configuration.
 
-            The userPassphrase is used to encrypt this KeyEncryptionKey. To
+            The user_passphrase is used to encrypt this KeyEncryptionKey. To
             decrypt the keys stored in the keys database, one must use
             BIP38, decrypt the KeyEncryptionKey from the configuration
-            store with the userPassphrase, and use the decrypted
+            store with the user_passphrase, and use the decrypted
             KeyEncryptionKey to decrypt the BIP38 encrypted private keys
             from the keys storage!
 
@@ -56,7 +64,7 @@ class WalletFile(object):
         if self.username is None:
             self.username = self.default_account
 
-        self.wallet_filename = os.path.join(WALLET_DIR, kwargs.get("wallet_file", self.default_wallet))
+        self.wallet_filename = os.path.join(wallet_dir, kwargs.get("wallet_file", self.default_wallet))
 
         self.plain_keys = {
             "keys": []}
@@ -114,7 +122,6 @@ class WalletFile(object):
             except Exception as e:
                 raise e
             self.derive_cipher_data(cipher_keys, salt, checksum_rawkeys)
-            # print(self.cipherData)
         else:
             raise Exception("Missing Data Cipher")
 
@@ -180,6 +187,9 @@ class WalletFile(object):
         if any(self.cipher_data):
             cipherData = json.dumps(self.cipher_data)
             try:
+                if not os.path.exists(self.wallet_filename):
+                    with open(self.wallet_filename, 'w'): pass
+
                 f = open(self.wallet_filename, "w")
                 f.write(cipherData)
                 f.close()
@@ -192,6 +202,9 @@ class WalletFile(object):
         if self.is_opened:
             self.purge()
 
+        if not os.path.exists(self.wallet_filename):
+            with open(self.wallet_filename, 'w'): pass
+
         with open(self.wallet_filename) as json_data:
             cipherData = json.load(json_data)
             try:
@@ -200,7 +213,7 @@ class WalletFile(object):
             except Exception as e:
                 raise e("File doesn't have right format")
 
-    def setup_wallet(self):
+    def set_up_wallet(self):
         self.open_file()
         self.decrypt_from_cipher_data()
 

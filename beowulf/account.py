@@ -1,10 +1,6 @@
 import time
-
-from toolz import dissoc
-
 from beowulfbase.exceptions import AccountDoesNotExistsException
 from .amount import Amount
-from .blockchain import Blockchain
 from .converter import Converter
 from .instance import shared_beowulfd_instance
 from .utils import parse_time, json_expand
@@ -170,7 +166,7 @@ class Account(dict):
     #             if type(filter_by) is str:
     #                 if op_type == filter_by:
     #                     yield construct_op(self.name)
-
+    #
     # def history(self,
     #             filter_by=None,
     #             start=0,
@@ -196,7 +192,7 @@ class Account(dict):
     #         ):
     #             yield account_history
     #         i += (batch_size + 1)
-
+    #
     # def history_reverse(self,
     #                     filter_by=None,
     #                     batch_size=1000,
