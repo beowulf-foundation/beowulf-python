@@ -150,7 +150,7 @@ class Commit(object):
         json_meta=None,
         owner_keys=[],
         owner_accounts=[],
-        owner_weight_threshold=None,
+        owner_weight_threshold=1,
         creator=None,
     ):
         if not creator:
@@ -250,7 +250,7 @@ class Commit(object):
             owner_key=None,
             additional_owner_keys=[],
             additional_owner_accounts=[],
-            owner_weight_threshold=None,
+            owner_weight_threshold=1,
             store_keys=True,
             store_owner_key=True,
             creator=None,
