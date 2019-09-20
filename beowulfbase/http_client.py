@@ -249,45 +249,13 @@ class HttpClient(object):
                 response = self.request(body=body)
                 success_codes = tuple(list(response.REDIRECT_STATUSES) + [200])
                 if response.status not in success_codes:
-                    raise RPCErrorRecoverable("non-200 response: %s from %s"
-                                              % (response.status, self.hostname))
+                    raise RuntimeError("non-200 response: %s from %s" % (response.status, self.hostname))
 
                 result = json.loads(response.data.decode('utf-8'))
                 assert result, 'result entirely blank'
 
                 if 'error' in result:
-                    # legacy (pre-appbase) nodes always return err code 1
-                    legacy = result['error']['code'] == 1
-                    detail = result['error']['message']
-
-                    # some errors have no data key (db lock error)
-                    if 'data' not in result['error']:
-                        error = 'error'
-                    # some errors have no name key (jussi errors)
-                    elif 'name' not in result['error']['data']:
-                        if 'exception' in error['data']:
-                            error = error['data']['exception']
-                        else:
-                            error = 'unspecified error'
-                    else:
-                        error = result['error']['data']['name']
-
-                    if legacy:
-                        detail = ":".join(detail.split("\n")[0:2])
-                        if not self._curr_node_downgraded():
-                            self._downgrade_curr_node()
-                            logging.error('Downgrade-retry %s', self.hostname)
-                            continue
-
-                    detail = ('%s from %s (%s) in %s' % (
-                        error, self.hostname, detail, name))
-
-                    if self._is_error_recoverable(result['error']):
-                        raise RPCErrorRecoverable(detail)
-                    else:
-                        logging.error(detail)
-                        raise RPCError(detail)
-
+                    raise RuntimeError(result)
                 return result['result']
 
             except retry_exceptions as e:
