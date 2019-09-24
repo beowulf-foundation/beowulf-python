@@ -13,6 +13,7 @@ from setuptools.command.test import test as TestCommand
 # Package meta-data.
 NAME = 'beowulf-python'
 DESCRIPTION = 'Official python beowulf library.'
+LONG_DESCRIPTION = 'beowulf-python is the official Beowulf library for Python'
 URL = 'https://github.com/beowulf-foundation/beowulf-python'
 EMAIL = 'contact@beowulfchain.com'
 AUTHOR = 'Beowulf Team'
@@ -129,10 +130,10 @@ class UploadCommand(Command):
 # Where the magic happens:
 setup(
     name=NAME,
-    version='0.0.2',
+    version='0.0.3',
     description=DESCRIPTION,
     keywords=['beowulf', 'beowulfchain', 'cryptocurrency', 'blockchain'],
-    # long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
