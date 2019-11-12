@@ -4,10 +4,11 @@ import re
 import struct
 from collections import OrderedDict
 from beowulf.utils import compat_bytes
+from beowulfbase.extensionids import extension_types, extension_type_names
 from .account import PublicKey
 from .operationids import operations
 from .types import (Uint8, Uint16, Uint32, Uint64, String, Bytes,
-                    Array, Bool, Optional, Map, Id, JsonObj, Int64)
+                    Array, Bool, Optional, Map, Id, JsonObj, Int64, TypeExt)
 
 default_prefix = "BEO"
 
@@ -262,6 +263,37 @@ class Symbol(GrapheneObject):
         decimals = int(str(self.data['decimals']))
         asset_name = str(self.data['name']) + "\x00" * (9 - len(str(self.data['name'])))
         return struct.pack("<I", decimals) + compat_bytes(asset_name, "ascii")
+
+
+class Extension(GrapheneObject):
+    def __init__(self, ex):
+        if isinstance(ex, dict):
+            self.typeName = ex['type']
+            self.typeId = extension_types[self.typeName]
+            self.data = ex['value']['data']
+        elif isinstance(ex, str):
+            if len(ex) == 0:
+                self.typeId = 0
+            else:
+                self.typeId = 1
+            self.typeName = extension_type_names[self.typeId]
+            self.data = ex
+        else:
+            raise ValueError("Unknown Extension Type")
+        super(Extension, self).__init__(
+            OrderedDict([
+                ('type', TypeExt(self.typeId)),
+                ('value', ValueExtension(self.data))
+            ]))
+
+
+class ValueExtension(GrapheneObject):
+    def __init__(self, d):
+        self.data = d
+        super(ValueExtension, self).__init__(
+            OrderedDict([
+                ('data', String(self.data))
+            ]))
 
 
 ########################################################

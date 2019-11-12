@@ -24,7 +24,8 @@ class TransactionBuilder(dict):
                  wallet_file_instance=None,
                  no_broadcast=False,
                  no_wallet_file=True,
-                 expiration=60):
+                 expiration=60,
+                 extensions=None):
         self.beowulfd = beowulfd_instance or shared_beowulfd_instance()
         self.no_broadcast = no_broadcast
         self.no_wallet_file = no_wallet_file
@@ -33,6 +34,7 @@ class TransactionBuilder(dict):
         self.wallet_file = wallet_file_instance
         self.op = []
         self.wifs = []
+        self.extensions = extensions
         if tx and not isinstance(tx, dict):
             raise ValueError("Invalid Transaction (self.tx) Format")
         super(TransactionBuilder, self).__init__(tx or {})
@@ -96,7 +98,8 @@ class TransactionBuilder(dict):
             ref_block_prefix=ref_block_prefix,
             expiration=expiration,
             operations=ops,
-            created_time=created_time)
+            created_time=created_time,
+            extensions=self.extensions)
         super(TransactionBuilder, self).__init__(tx.json())
 
     def sign(self):

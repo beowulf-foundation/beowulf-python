@@ -71,7 +71,7 @@ class Commit(object):
         else:
             self.wallet_file = WalletFile(**kwargs)
 
-    def finalizeOp(self, ops, account, permission):
+    def finalizeOp(self, ops, account, permission, extensions=None):
         """ This method obtains the required private keys if present in
             the wallet, finalizes the transaction, signs it and
             broadacasts it
@@ -82,8 +82,8 @@ class Commit(object):
             :param operation account: The account that authorizes the
                 operation
             :param string permission: The required permission for
-                signing (active, owner, posting)
-
+                signing (owner)
+            :param extensions: The extensions add to operation
             ... note::
 
                 If ``ops`` is a list of operation, they all need to be
@@ -99,7 +99,8 @@ class Commit(object):
             wallet_file_instance=self.wallet_file,
             no_broadcast=self.no_broadcast,
             no_wallet_file=self.no_wallet_file,
-            expiration=self.expiration)
+            expiration=self.expiration,
+            extensions=extensions)
         tx.appendOps(ops)
 
         if self.unsigned:
@@ -486,7 +487,7 @@ class Commit(object):
 
         return self.finalizeOp(op, account_name, "owner")
 
-    def transfer(self, to, amount, asset, fee=None, asset_fee=None, memo="", account=None):
+    def transfer(self, to, amount, asset, fee=None, asset_fee=None, memo="", account=None, extensions=None):
         """ Transfer W or BWF to another account.
 
             :param str to: Recipient
@@ -504,6 +505,8 @@ class Commit(object):
 
             :param str account: (optional) the source account for the transfer
             if not ``default_account``
+
+            :param str extensions: extend data
 
         """
         if not account:
@@ -556,7 +559,7 @@ class Commit(object):
                 "memo":
                     memo
             })
-        return self.finalizeOp(op, account, "owner")
+        return self.finalizeOp(op, account, "owner", extensions)
 
     def create_token(self, creator, control_account, max_supply, decimals, token_name):
         """ Create new token.

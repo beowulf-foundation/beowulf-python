@@ -11,7 +11,7 @@ import ecdsa
 from beowulf.utils import compat_bytes, compat_chr
 from .account import PrivateKey, PublicKey
 from .chains import known_chains
-from .operations import Operation, GrapheneObject, isArgsThisClass
+from .operations import Operation, GrapheneObject, isArgsThisClass, Extension
 from .types import (
     Array,
     Set,
@@ -52,10 +52,6 @@ class SignedTransaction(GrapheneObject):
         else:
             if len(args) == 1 and len(kwargs) == 0:
                 kwargs = args[0]
-            if "extensions" not in kwargs:
-                kwargs["extensions"] = Set([])
-            elif not kwargs.get("extensions"):
-                kwargs["extensions"] = Set([])
             if "signatures" not in kwargs:
                 kwargs["signatures"] = Array([])
             else:
@@ -71,6 +67,22 @@ class SignedTransaction(GrapheneObject):
                         [Operation(a) for a in kwargs["operations"]])
                 else:
                     kwargs['operations'] = Array(kwargs["operations"])
+
+            if "extensions" not in kwargs:
+                kwargs["extensions"] = Set([])
+            elif not kwargs.get("extensions") or len(kwargs.get("extensions")) == 0:
+                kwargs["extensions"] = Set([])
+            elif "extensions" in kwargs:
+                if isinstance(kwargs["extensions"], str):
+                    kwargs["extensions"] = [kwargs["extensions"]]
+                if all([
+                    not isinstance(a, Extension)
+                    for a in kwargs["extensions"]
+                ]):
+                    kwargs['extensions'] = Set(
+                        [Extension(a) for a in kwargs["extensions"]])
+                else:
+                    kwargs['extensions'] = Set(kwargs["extensions"])
 
             super(SignedTransaction, self).__init__(
                 OrderedDict([

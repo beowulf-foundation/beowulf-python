@@ -5,6 +5,7 @@ import time
 from binascii import hexlify, unhexlify
 from calendar import timegm
 from beowulf.utils import compat_bytes, compat_json
+from beowulfbase.extensionids import extension_type_names
 
 object_type = {
     "dynamic_global_property": 0,
@@ -363,6 +364,18 @@ class Id:
 
     def __str__(self):
         return str(self.data)
+
+
+class TypeExt:
+    def __init__(self, type_id):
+        self.type_id = type_id
+        self.type_name = extension_type_names[self.type_id]
+
+    def __bytes__(self):
+        return struct.pack("<B", self.type_id)
+
+    def __str__(self):
+        return str(self.type_name)
 
 
 class VoteId:
