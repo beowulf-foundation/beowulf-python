@@ -172,5 +172,5 @@ Full documentation is available at **https://beowulfchain.com/developer-guide/py
 2. [Wallet API document](https://github.com/beowulf-foundation/beowulf-python/blob/master/docs/wallet.md)
 3. [Beowulf API document](https://github.com/beowulf-foundation/beowulf-python/blob/master/docs/beowulfd.md)
 
- ## License
- MIT, see the LICENSE file.  
+## License
+MIT, see the LICENSE file.  
