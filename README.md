@@ -55,11 +55,7 @@ sudo apt-get install libssl-dev
 
 From pip:  
 ```bash
-// MainNet
 pip install beowulf-python
-
-// TestNet
-pip install beowulf-python-testnet
 ```
 
 From Source:  
@@ -71,34 +67,6 @@ cd beowulf-python
 python3 setup.py install        # python setup.py install for 2.7
 or
 make install
-```
-
-## Check version
-```bash
-pip show beowulf-python
-```
-
-## Configuration
-Create a new client instance of Beowulfd and add your account to wallet 
-  
-```python
-from beowulf.beowulfd import Beowulfd
-from beowulf.commit import Commit
-
-# Client setup
-s = Beowulfd()
-# Replace with your Private key and account name already have or get 
-# from services
-pri_key = "5Jxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-account = "creatorwallet"
-
-c = Commit(beowulfd_instance=s, no_wallet_file=True)
-# Provide a passphrase for the new wallet for the first time.
-# Unlock wallet before create transactions with passphrase.
-c.wallet.unlock("your_password")
-
-if not c.wallet.getOwnerKeyForAccount(account):
-    c.wallet.addPrivateKey(pri_key)    
 ```
 
 ## Example Usage
@@ -159,18 +127,3 @@ transaction_id = '45618f73e9dbbe87a9ae6bfc316de8457c502b7c'
 trx = c.beowulfd.get_transaction(transaction_id)
 print(trx)
 ```
-
-## Bugs and Feedback
-For bugs or feature requests please create a [GitHub Issue](https://github.com/beowulf-foundation/beowulf-python/issues).  
-
-## Documentation
-
-Full documentation is available at **https://beowulfchain.com/developer-guide/python**
-
-##### Detail
-1. [Commit API document](https://github.com/beowulf-foundation/beowulf-python/blob/master/docs/commit.md)
-2. [Wallet API document](https://github.com/beowulf-foundation/beowulf-python/blob/master/docs/wallet.md)
-3. [Beowulf API document](https://github.com/beowulf-foundation/beowulf-python/blob/master/docs/beowulfd.md)
-
-## License
-MIT, see the LICENSE file.  
