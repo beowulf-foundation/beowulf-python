@@ -14,7 +14,7 @@ This library currently works on Python 2.7, 3.5 and 3.6. Python 3.3 and 3.4 supp
 - create transaction transfer
 - create account
 
-### Requirements
+## Requirements
 * `beowulf-python` requires Python 3.5 or higher.  
 * Library dependencies
 ```sh
@@ -34,7 +34,7 @@ urllib3
 voluptuous
 w3lib
 ```
-## Requirements
+
 ### OSX
 
 On Mac OSX, you may need to do the following first:
