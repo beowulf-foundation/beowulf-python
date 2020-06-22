@@ -94,30 +94,23 @@ if not c.wallet.getOwnerKeyForAccount(account):
 
 ## Example Usage
 
-##### Get account
+##### Get block
 ```python
-acc = c.wallet.getAccounts()
-print(acc)
-# get public key
-pub_key = c.wallet.getPublicKeys()
-print(pub_key)
+# Get block from block number
+block_num = 1869
+block = c.beowulfd.get_block(block_num)
+print(block)
 ```
 
-##### Creating a wallet
+##### Get transaction
 ```python
-# Variances
-creator = "creatorwallet"
-new_account_name = "newwallet"
-new_password_seed = "password_seed"
-new_password_wallet = "password_wallet"
-
-# Create account
-if not c.beowulfd.get_account(new_account_name):
-  c.create_account_simple(account_name=new_account_name, creator=creator, password_seed=new_password_seed, password_wallet=new_password_wallet)
+# Get transaction from transaction_id
+transaction_id = '45618f73e9dbbe87a9ae6bfc316de8457c502b7c'
+trx = c.beowulfd.get_transaction(transaction_id)
+print(trx)
 ```
-
-##### Signing and pushing a transaction
-
+##### Transfer native coin
+###### Transfer BWF
 ```python
 # Transfer native coin
 asset_bwf = "BWF"
@@ -129,24 +122,31 @@ fee = "0.01000"
 
 # Transfer BWF from creator to new_account_name
 c.transfer(account=creator, amount=amount, asset=asset_bwf, fee=fee, asset_fee=asset_fee, memo="", to=new_account_name)
+```
+
+###### Transfer W
+```python
+# Transfer native coin
+asset_bwf = "BWF"
+asset_w = "W"
+asset_tot = "TOT"
+asset_fee = "W"
+amount = "1.00000"
+fee = "0.01000"
+
 # Transfer W from creator to new_account_name
 c.transfer(account=creator, amount=amount, asset=asset_w, fee=fee, asset_fee=asset_fee, memo="", to=new_account_name)
-# Transfer Token TOT from creator to new_account_name
-c.transfer_token(to=new_account_name, amount=amount, asset_name=asset_tot, fee=fee, asset_fee=asset_fee, memo="", account=creator)
 ```
 
-##### Getting a block
+##### Create wallet
 ```python
-# Get block from block number
-block_num = 1869
-block = c.beowulfd.get_block(block_num)
-print(block)
-```
+# Variances
+creator = "creatorwallet"
+new_account_name = "newwallet"
+new_password_seed = "password_seed"
+new_password_wallet = "password_wallet"
 
-##### Getting a transaction
-```python
-# Get transaction from transaction_id
-transaction_id = '45618f73e9dbbe87a9ae6bfc316de8457c502b7c'
-trx = c.beowulfd.get_transaction(transaction_id)
-print(trx)
+# Create account
+if not c.beowulfd.get_account(new_account_name):
+  c.create_account_simple(account_name=new_account_name, creator=creator, password_seed=new_password_seed, password_wallet=new_password_wallet)
 ```
