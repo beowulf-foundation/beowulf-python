@@ -71,12 +71,13 @@ make install
 ## Configuration
 
 Create a new client instance of Beowulfd and add your account to wallet
+replace nodes with your endpoints which participate to MAINNET or TESTNET chain
 
 from beowulf.beowulfd import Beowulfd
 from beowulf.commit import Commit
 
 ##### Client setup
-```s = Beowulfd()```
+```s = Beowulfd(nodes = ['https://testnet-bw.beowulfchain.com/rpc'])```
 ##### Replace with your Private key and account name already have or get 
 ##### from services
 ```pri_key = "5Jxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"

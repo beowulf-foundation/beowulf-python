@@ -1,11 +1,15 @@
 # coding=utf-8
 import logging
+
 from funcy.seqs import first
+
 from beowulfbase.chains import known_chains
 from beowulfbase.http_client import HttpClient
 from .instance import get_config_node_list
 from .utils import compat_compose_dictionary
+
 logger = logging.getLogger(__name__)
+
 
 class Beowulfd(HttpClient):
     """ Connect to the Beowulf network.
@@ -40,8 +44,9 @@ class Beowulfd(HttpClient):
 
     def __init__(self, nodes=None, **kwargs):
         if not nodes:
-            nodes = get_config_node_list() or ['https://bw.beowulfchain.com']
+            nodes = get_config_node_list()
 
+        assert len(nodes) != 0, "Client need endpoints to connect"
         super(Beowulfd, self).__init__(nodes, **kwargs)
 
     @property
@@ -50,8 +55,13 @@ class Beowulfd(HttpClient):
             dictionary with keys chain_id, prefix, and other chain
             specific settings
         """
-        props = self.get_dynamic_global_properties()
-        chain = props["current_supply"].split(" ")[1]
+        props = self.get_config()
+        testnet_chain_flag = props["IS_TEST_NET"]
+
+        if testnet_chain_flag:
+            chain = "TESTNET"
+        else:
+            chain = "MAINNET"
 
         assert chain in known_chains, "The chain you are connecting " + \
                                       "to is not supported"
