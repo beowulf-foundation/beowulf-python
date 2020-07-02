@@ -70,8 +70,9 @@ make install
 ```
 ## Configuration
 
-Create a new client instance of Beowulfd and add your account to wallet  
-Replace nodes with your endpoints which participate to MAINNET or TESTNET chain
+* Create a new client instance of Beowulfd and add your account to wallet  
+* Replace nodes with your endpoints which participate to MAINNET or TESTNET chain  
+*Note:* Client library will detect MAINNET or TESTNET properties through your provided endpoint.
 
 ##### Client setup
 ```
